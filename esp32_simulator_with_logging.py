@@ -5,6 +5,7 @@ import time
 import json
 import base64
 import random
+import uuid
 import numpy as np
 from datetime import datetime
 import logging
@@ -54,7 +55,8 @@ class ESP32Node(threading.Thread):
         self.device_id = device_id
         self.client = mqtt.Client(client_id=f"esp32_{device_id}", protocol=mqtt.MQTTv311)
         self.client.username_pw_set("wspmqtt", "WSP@2025")
-        self.packet_seq = random.randint(10000, 50000)
+        self.packet_seq = 1
+        self.session_id = str(uuid.uuid4())
         self.connected = False
         self.try_connect()
 
@@ -98,6 +100,7 @@ class ESP32Node(threading.Thread):
             "data": ecg_data_b64,
             "packet_id": f"{time.time()}.{self.device_id}.{self.packet_seq}",
             "seq_no": self.packet_seq,
+            "session_id": self.session_id,
             "battery": battery,
             "sample_rate": SAMPLE_RATE,
             "lead_status": lead_status,
